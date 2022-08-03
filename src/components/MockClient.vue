@@ -10,7 +10,8 @@ const result = ref("");
 const count = ref(0);
 const loading = ref(false);
 const loadingEngine = ref(false);
-const server = ref("http://localhost:3000");
+// const server = ref("http://localhost:3000");
+const server = ref("https://ix-json-server.onrender.com");
 const endpoint = ref("pipeline");
 const id = ref("1");
 /**
