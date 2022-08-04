@@ -4,11 +4,20 @@ export type ResponseApi = {
   policies: any;
   expressions?: any;
 };
-import { computed, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 // @ts-ignore
 import PolicyEngine from "pr-policy-evaluator";
 
 defineProps<{ msg: string }>();
+
+const el = ref();
+
+onMounted(() => {
+  // @ts-ignore
+  const theme = document.getElementById("html").dataset.theme;
+  console.log(theme);
+  // document.querySelector("html").data("theme", "dark");
+});
 
 const defaultResponse: ResponseApi = {
   id: "",
@@ -18,14 +27,15 @@ const defaultResponse: ResponseApi = {
 
 const response = ref(defaultResponse);
 
+const darkMode = ref(false);
 const result = ref("");
 const count = ref(0);
 const loading = ref(false);
 const loadingEngine = ref(false);
 const apiError = ref(false);
 const apiOk = ref(false);
-// const server = ref("http://localhost:3000");
-const server = ref("https://ix-json-server.onrender.com");
+const server = ref("http://localhost:3000");
+// const server = ref("https://ix-json-server.onrender.com");
 const endpoint = ref("pipeline");
 const id = ref("1");
 
@@ -42,9 +52,18 @@ const disableRun = computed(() => {
   return true;
 });
 
+watch(
+  () => darkMode.value,
+  (value, prevValue) => {
+    // @ts-ignore
+    document.getElementById("html").dataset.theme = value ? "dark" : "light";
+  }
+);
+
 function clearAlerts() {
   apiError.value = false;
   apiOk.value = false;
+  result.value = "";
 }
 
 /**
@@ -87,7 +106,21 @@ async function runEngine() {
     <div class="grid">
       <div>
         <article>
-          <header>{{ msg }}</header>
+          <fieldset>
+            <label for="switch">
+              <input
+                type="checkbox"
+                id="switch"
+                v-model="darkMode"
+                name="switch"
+                role="switch"
+              />
+              Dark mode
+            </label>
+          </fieldset>
+          <header>
+            <kbd>{{ msg }}</kbd>
+          </header>
           <form>
             <label for="id">
               Id:
@@ -137,7 +170,9 @@ async function runEngine() {
           </details>
         </article>
         <article>
-          <header>Ejecutar engine ⚙️</header>
+          <header>
+            <kbd>Ejecutar engine ⚙️</kbd>
+          </header>
           <button
             :disabled="disableRun"
             :aria-busy="loadingEngine"

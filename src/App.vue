@@ -2,7 +2,7 @@
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
 import "@picocss/pico/css/pico.min.css";
-import MockClient from './components/MockClient.vue'
+import MockClient from "./components/MockClient.vue";
 </script>
 
 <template>
@@ -14,9 +14,7 @@ import MockClient from './components/MockClient.vue'
       <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
     </a>
   </div> -->
-  <MockClient msg="Fetch pipeline"/>
+  <MockClient msg="Fetch pipeline" />
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
