@@ -1,19 +1,52 @@
 <script setup lang="ts">
-import { ref } from "vue";
+export type ResponseApi = {
+  id: string;
+  policies: any;
+  expressions?: any;
+};
+import { computed, ref } from "vue";
 // @ts-ignore
 import PolicyEngine from "pr-policy-evaluator";
 
 defineProps<{ msg: string }>();
 
-const response = ref("");
+const defaultResponse: ResponseApi = {
+  id: "",
+  policies: {},
+  expressions: {},
+};
+
+const response = ref(defaultResponse);
+
 const result = ref("");
 const count = ref(0);
 const loading = ref(false);
 const loadingEngine = ref(false);
-// const server = ref("http://localhost:3000");
-const server = ref("https://ix-json-server.onrender.com");
+const apiError = ref(false);
+const apiOk = ref(false);
+const server = ref("http://localhost:3000");
+// const server = ref("https://ix-json-server.onrender.com");
 const endpoint = ref("pipeline");
 const id = ref("1");
+
+const someReactiveRef = ref(null);
+
+const disableRun = computed(() => {
+  console.log(response.value);
+  console.log(typeof response.value);
+
+  if (response.value.id) {
+    return false;
+  }
+
+  return true;
+});
+
+function clearAlerts() {
+  apiError.value = false;
+  apiOk.value = false;
+}
+
 /**
  * @function fetchPipeline
  * @param {string} id
@@ -21,22 +54,31 @@ const id = ref("1");
  * @description Method to fetch data from a remote server
  */
 function fetchPipeline() {
+  clearAlerts();
+
   loading.value = true;
-  response.value = "";
+  response.value = defaultResponse;
+
   fetch(`${server.value}/${endpoint.value}/${id.value}`)
     .then((res) => res.json())
     .then((data) => {
       console.log(data.data.items);
       response.value = data.data.items;
       loading.value = false;
+
+      if (!data.data.items.id) {
+        apiError.value = true;
+      } else {
+        apiOk.value = true;
+      }
     });
 }
 
 async function runEngine() {
-  loading.value = true;
+  loadingEngine.value = true;
   result.value = "";
   result.value = await PolicyEngine.startPolicyEngine(response.value);
-  loading.value = false;
+  loadingEngine.value = false;
 }
 </script>
 
@@ -50,6 +92,7 @@ async function runEngine() {
             <label for="id">
               Id:
               <input
+                @keyup="clearAlerts()"
                 id="id"
                 name="id"
                 placeholder="Identificador del pipeline"
@@ -67,6 +110,17 @@ async function runEngine() {
             </button>
           </form>
           <footer>
+            <p v-show="apiError">
+              <mark>
+                No se encontró un pipeline con el identificador: {{ id }}
+              </mark>
+            </p>
+            <p v-show="apiOk">
+              <ins>
+                ✅ Se encontró un pipeline con el identificador: {{ id }}
+              </ins>
+            </p>
+
             <p>
               Endpoint:
               <code>[server]/{{ endpoint }}/{{ id }}</code>
@@ -85,7 +139,7 @@ async function runEngine() {
         <article>
           <header>Ejecutar engine ⚙️</header>
           <button
-            :disabled="response === ''"
+            :disabled="disableRun"
             :aria-busy="loadingEngine"
             type="button"
             @click.prevent="runEngine()"
