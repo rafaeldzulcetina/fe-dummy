@@ -34,8 +34,8 @@ const loading = ref(false);
 const loadingEngine = ref(false);
 const apiError = ref(false);
 const apiOk = ref(false);
-const server = ref("http://localhost:3000");
-// const server = ref("https://ix-json-server.onrender.com");
+// const server = ref("http://localhost:3000");
+const server = ref("https://ix-json-server.onrender.com");
 const endpoint = ref("pipeline");
 const id = ref("1");
 
