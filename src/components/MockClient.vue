@@ -81,11 +81,11 @@ function fetchPipeline() {
   fetch(`${server.value}/${endpoint.value}/${id.value}`)
     .then((res) => res.json())
     .then((data) => {
-      console.log(data);
-      response.value = data;
+      console.log(data.data);
+      response.value = data.data;
       loading.value = false;
 
-      if (!data.id) {
+      if (!data.data.id) {
         apiError.value = true;
       } else {
         apiOk.value = true;
